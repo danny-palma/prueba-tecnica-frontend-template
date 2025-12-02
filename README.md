@@ -1,36 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prueba Técnica Frontend - Excalibur
 
-## Getting Started
+Proyecto básico de Next.js con TypeScript y React para prueba técnica.
 
-First, run the development server:
+## 🚀 Tecnologías utilizadas
 
+- **Next.js 16** - Framework de React con App Router
+- **React 19** - Biblioteca de interfaz de usuario
+- **TypeScript** - Superset de JavaScript con tipado estático
+- **Tailwind CSS** - Framework de CSS utilitario
+- **ESLint** - Linter para mantener calidad de código
+
+## 📦 Instalación
+
+1. Clona el repositorio:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <url-del-repositorio>
+cd pruebatecnica-frontend-excalibur
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Instala las dependencias:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Ejecuta el servidor de desarrollo:
+```bash
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-## Learn More
+## 🏗️ Estructura del proyecto
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+├── app/                    # App Router de Next.js
+│   ├── about/             # Página "Acerca de"
+│   ├── layout.tsx         # Layout principal
+│   └── page.tsx           # Página de inicio
+├── components/            # Componentes reutilizables
+│   └── Welcome.tsx        # Componente de bienvenida
+├── lib/                   # Utilidades y configuración
+│   └── utils.ts           # Funciones de utilidad
+└── types/                 # Definiciones de tipos TypeScript
+    └── index.ts           # Tipos principales
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎯 Características implementadas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- ✅ Configuración completa de TypeScript
+- ✅ Componentes React con tipado fuerte
+- ✅ Utilidades y tipos comunes
+- ✅ Diseño responsivo con Tailwind CSS
+- ✅ Soporte para modo oscuro
+- ✅ Estructura de proyecto organizada
+- ✅ Routing con App Router de Next.js
 
-## Deploy on Vercel
+## 🛠️ Scripts disponibles
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run dev      # Ejecuta el servidor de desarrollo
+npm run build    # Construye la aplicación para producción
+npm start        # Ejecuta la aplicación en modo producción
+npm run lint     # Ejecuta ESLint para revisar el código
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📝 Desarrollo
+
+Para agregar nuevas funcionalidades:
+
+1. Crea componentes en `src/components/`
+2. Define tipos en `src/types/`
+3. Agrega utilidades en `src/lib/`
+4. Crea nuevas páginas en `src/app/`
+
+## 🔧 Configuración
+
+El proyecto incluye configuración para:
+
+- TypeScript (`tsconfig.json`)
+- Tailwind CSS (`postcss.config.mjs`, `tailwind.config.ts`)
+- ESLint (`eslint.config.mjs`)
+- Next.js (`next.config.ts`)
+
+## 📱 Despliegue
+
+Para desplegar en Vercel:
+
+```bash
+npm run build
+```
+
+El proyecto está listo para desplegarse en cualquier plataforma que soporte Next.js.
