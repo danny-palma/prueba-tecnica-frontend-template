@@ -16,12 +16,14 @@ const expensiveCalculation = (data: Product[]) => {
 export const useProductData = (initialData: Product[]) => {
     const [data] = useState<Product[]>(initialData);
     const [isPending, startTransition] = useTransition();
-    const [filter, setFilter] = useState("");
+    const [filter, setFilter] = useState(""); // This will be the deferred filter
+    const [inputValue, setInputValue] = useState(""); // This will be the immediate input value
     const [sort, setSort] = useState<'asc' | 'desc'>("asc");
 
     const handleFilterChange = (value: string) => {
+        setInputValue(value); // Update UI immediately
         startTransition(() => {
-            setFilter(value);
+            setFilter(value); // Defer the heavy filtering logic
         });
     };
 
@@ -53,7 +55,7 @@ export const useProductData = (initialData: Product[]) => {
 
     return {
         isPending,
-        filter,
+        filter: inputValue, // Return inputValue as 'filter' for the UI to bind to
         setFilter: handleFilterChange,
         sort,
         setSort,
