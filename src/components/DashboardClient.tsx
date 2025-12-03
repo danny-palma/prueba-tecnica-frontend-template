@@ -1,8 +1,8 @@
 "use client";
 import { Product, Stats } from "@/types";
-import { useEffect, useState } from "react";
+import { useProductDashboard } from "@/hooks/useProductDashboard";
 import StatsProducts from "./StatsProducts";
-import ProductCard  from "./ProductCard";
+import ProductCard from "./ProductCard";
 
 type Props = {
   initialItems: Product[];
@@ -11,63 +11,19 @@ type Props = {
   initialStats: Stats;
 };
 
-const DashboardClient = ({
-  initialItems,
-  initialPage,
-  pageSize,
-  initialStats,
-}: Props) => {
-  const [items, setItems] = useState<Product[]>(initialItems);
-  const [filter, setFilter] = useState("");
-  const [sort, setSort] = useState<"asc" | "desc">("asc");
-  const [page, setPage] = useState(initialPage);
-  const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState<Stats>(initialStats);
-
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      fetchPage();
-    }, 300);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter, sort, page]);
-
-
-  const fetchPage = async () => {
-    setLoading(true);
-    try {
-      const q = new URLSearchParams({
-        filter,
-        sort,
-        page: String(page),
-        pageSize: String(pageSize),
-      });
-
-      const res = await fetch(`/api/products?${q.toString()}`);
-      if (!res.ok) throw new Error("Error fetching products");
-      const body = await res.json();
-      setItems(body.items);
-      setStats({ totalItems: body.totalItems, totalValue: body.totalValue });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const totalPages = Math.max(1, Math.ceil(stats.totalItems / pageSize));
-
-  const handleFilterChange = (val: string) => {
-    setPage(1);
-    setFilter(val);
-  };
-
-  const toggleSort = () => {
-    setSort(s => (s === "asc" ? "desc" : "asc"));
-    setPage(1);
-  };
-
+const DashboardClient = (props: Props) => {
+  const {
+    items,
+    stats,
+    loading,
+    filter,
+    sort,
+    page,
+    totalPages,
+    setPage,
+    handleFilterChange,
+    toggleSort,
+  } = useProductDashboard(props);
 
   return (
     <>
@@ -131,6 +87,6 @@ const DashboardClient = ({
       </div>
     </>
   );
-}
+};
 
-export default DashboardClient
+export default DashboardClient;
