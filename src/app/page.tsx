@@ -1,9 +1,15 @@
 import { initialData } from "../lib/mockData";
 import DashboardClient from "../components/DashboardClient";
+import { Product } from "@/types";
+
+const PAGE_SIZE = 24;
 
 const HomePage = () => {
   const totalItems = initialData.length;
   const totalValue = initialData.reduce((acc, p) => acc + p.price, 0);
+  const initialPage = 1;
+  const start = (initialPage - 1) * PAGE_SIZE;
+  const initialItems: Product[] = initialData.slice(start, start + PAGE_SIZE);
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
@@ -14,7 +20,9 @@ const HomePage = () => {
           </h1>
 
           <DashboardClient
-            initialItems={initialData}
+            initialItems={initialItems}
+            initialPage={initialPage}
+            pageSize={PAGE_SIZE}
             initialStats={{ totalItems, totalValue }}
           />
         </div>

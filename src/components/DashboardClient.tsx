@@ -4,72 +4,66 @@ import React, { useEffect, useState } from "react";
 
 type Props = {
   initialItems: Product[];
+  initialPage: number;
+  pageSize: number;
   initialStats: Stats;
 };
 
-const expensiveCalculation = (data: Product[]) => {
-  console.log("Calculando estadísticas pesadas...");
-  let sum = 0;
-  for (let i = 0; i < data.length; i++) {
-    for (let j = 0; j < 10000; j++) {
-      sum += Math.random();
-    }
-  }
-  return data.map(item => ({ ...item, complexScore: sum }));
-};
-
-
 const DashboardClient = ({
   initialItems,
+  initialPage,
+  pageSize,
   initialStats,
 }: Props) => {
-  const [data, setData] = useState<Product[]>(initialItems);
-  const [filteredData, setFilteredData] = useState<Product[]>(initialItems);
-  const [searchFilter, setSearchFilter] = useState<string>("");
+  const [items, setItems] = useState<Product[]>(initialItems);
+  const [filter, setFilter] = useState("");
   const [sort, setSort] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(initialPage);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<Stats>(initialStats);
 
 
   useEffect(() => {
-    setData(initialItems);
-    setFilteredData(initialItems);
-    setSearchFilter("");
-    setLoading(false);
-  }, [initialItems]);
+    const t = setTimeout(() => {
+      fetchPage();
+    }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter, sort, page]);
 
 
-  useEffect(() => {
-    const lowerFilter = searchFilter.toLowerCase();
+  const fetchPage = async () => {
+    setLoading(true);
+    try {
+      const q = new URLSearchParams({
+        filter,
+        sort,
+        page: String(page),
+        pageSize: String(pageSize),
+      });
 
-    // Algoritmo ineficiente de filtrado
-    let result = data.filter((item: Product) => {
-      return item.name.toLowerCase().includes(lowerFilter) ||
-        item.description.toLowerCase().includes(lowerFilter) ||
-        item.category.toLowerCase().includes(lowerFilter);
-    });
-
-    if (sort === 'asc') {
-      result = result.sort((a, b) => a.price - b.price);
-    } else {
-      result = result.sort((a, b) => b.price - a.price);
+      const res = await fetch(`/api/products?${q.toString()}`);
+      if (!res.ok) throw new Error("Error fetching products");
+      const body = await res.json();
+      setItems(body.items);
+      setStats({ totalItems: body.totalItems, totalValue: body.totalValue });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    const processed = expensiveCalculation(result);
-    setFilteredData(processed);
-
-    const totalValue = result.reduce((acc, curr) => acc + curr.price, 0);
-    setStats({ totalItems: result.length, totalValue });
-
-  }, [searchFilter, sort, data]);
-
+  const totalPages = Math.max(1, Math.ceil(stats.totalItems / pageSize));
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchFilter(e.target.value);
+    setPage(1);
+    setFilter(e.target.value);
   };
 
   const toggleSort = () => {
     setSort(s => (s === "asc" ? "desc" : "asc"));
+    setPage(1);
   };
 
 
@@ -80,7 +74,7 @@ const DashboardClient = ({
           <input
             type="text"
             placeholder="Buscar productos..."
-            value={searchFilter}
+            value={filter}
             onChange={handleFilterChange}
             className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 shadow-sm transition-all duration-200"
           />
@@ -125,7 +119,7 @@ const DashboardClient = ({
       {
         !loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredData.map((item) => (
+            {items.map((item) => (
               <div key={item.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200">
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-2">{item.name}</h3>
@@ -154,6 +148,28 @@ const DashboardClient = ({
           </div>
         )
       }
+
+      <div className="flex items-center justify-between mt-6">
+        <div className="text-sm text-gray-600 dark:text-gray-300">
+          Página {page} de {totalPages}
+        </div>
+        <div className="flex gap-2">
+          <button
+            disabled={page <= 1 || loading}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border shadow-sm disabled:opacity-50"
+          >
+            Anterior
+          </button>
+          <button
+            disabled={page >= totalPages || loading}
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            className="px-4 py-2 rounded-lg bg-white dark:bg-gray-800 border shadow-sm disabled:opacity-50"
+          >
+            Siguiente
+          </button>
+        </div>
+      </div>
     </>
   );
 }
