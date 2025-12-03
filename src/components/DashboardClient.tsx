@@ -1,17 +1,11 @@
 "use client";
-import { Product, Stats } from "@/types";
+import { PropsDashboardClient} from "@/types";
 import { useProductDashboard } from "@/hooks/useProductDashboard";
 import StatsProducts from "./StatsProducts";
 import ProductCard from "./ProductCard";
 
-type Props = {
-  initialItems: Product[];
-  initialPage: number;
-  pageSize: number;
-  initialStats: Stats;
-};
 
-const DashboardClient = (props: Props) => {
+const DashboardClient = (props: PropsDashboardClient) => {
   const {
     items,
     stats,

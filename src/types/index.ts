@@ -14,3 +14,15 @@ export interface Stats {
   totalValue: number;
 }
 
+export interface PropsDashboardClient {
+  initialItems: Product[];
+  initialPage: number;
+  pageSize: number;
+  initialStats: Stats;
+};
+
+export interface UseProductDashboardProps {
+  initialItems: Product[];
+  initialStats: Stats;
+  pageSize: number;
+};

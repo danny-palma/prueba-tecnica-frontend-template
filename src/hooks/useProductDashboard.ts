@@ -1,11 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { Product, Stats } from "@/types";
+import { Product, Stats, UseProductDashboardProps } from "@/types";
 
-type UseProductDashboardProps = {
-  initialItems: Product[];
-  initialStats: Stats;
-  pageSize: number;
-};
 
 export const useProductDashboard = ({ initialItems, initialStats, pageSize }: UseProductDashboardProps) => {
   const [items, setItems] = useState<Product[]>(initialItems);

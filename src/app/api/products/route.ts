@@ -1,14 +1,7 @@
 import { initialData } from "@/lib/mockData";
-import { Product } from "@/types";
+import { expensiveCalculation } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
-
-function expensiveCalculation(items: Product[]) {
-  return items.map((it) => ({
-    ...it,
-    complexScore: (it.price * 0.1) + (it.stock * 0.01),
-  }));
-}
 
 export async function GET(req: Request) {
   try {
