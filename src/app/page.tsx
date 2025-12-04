@@ -2,96 +2,90 @@
 // Es un Server Component por defecto en Next.js (app dir), pero está escrito como si fuera React viejo.
 // Contiene: Bad Performance, Any types, Fetching waterfall, Logic coupling.
 
-"use client";
+'use client'
 
-import React, { useState, useEffect } from 'react';
-import { generateMockData, initialData } from '../lib/mockData';
-import { Loading } from '@/components/Loading';
-import { Header } from '@/components/Header';
-import { Filter } from '@/components/Filter';
-import { Stats } from '@/components/Stats';
-import { FilteredData } from '@/components/FilteredData';
-import { , ProductItem, StatsProps, FilterProps } from '@/types';
-
-const expensiveCalculation = (data: ProductItem[]) => {
-  console.log("Calculando estadísticas pesadas...");
-  let sum = 0;
-  for (let i = 0; i < data.length; i++) {
-    for (let j = 0; j < 10000; j++) {
-      sum += Math.random();
-    }
-  }
-  return data.map(item => ({ ...item, complexScore: sum }));
-};
+import React, { useState, useEffect, useMemo } from 'react'
+import { getInitialData } from '../lib/mockData'
+import { Loading } from '@/components/Loading'
+import { Header } from '@/components/Header'
+import { Filter } from '@/components/Filter'
+import { Stats } from '@/components/Stats'
+import { FilteredData } from '@/components/FilteredData'
+import { ProductItem, StatsProps } from '@/types'
+import { expensiveCalculation } from '@/helpers/expensiveCalculation'
+import { useFilter } from '@/hooks/useFilter'
 
 const LegacyDashboard = () => {
-  const [data, setData] = useState<ProductItem[]>([]);
-  const [filteredData, setFilteredData] = useState<ProductItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [filter, setFilter] = useState<string>("");
-  const [sort, setSort] = useState<string>("asc");
-  const [stats, setStats] = useState<StatsProps>({totalItems: 0, totalValue: 0});
+	const [data, setData] = useState<ProductItem[]>([])
+	const [loading, setLoading] = useState<boolean>(true)
+	const [filter, setFilter] = useState<string>('')
+	const [sort, setSort] = useState<string>('asc')
+	const [currentPage, setCurrentPage] = useState<number>(1)
+	const itemsPerPage = 12
 
-  // Fetching de datos simulado
-  useEffect(() => {
-    setData(initialData);
-    setFilteredData(initialData);
-    setLoading(false);
-  }, []);
+	// Fetching de datos simulado
+	useEffect(() => {
+		setData(() => getInitialData(5000))
+		setLoading(false)
+	}, [])
 
-  useEffect(() => {
-    const lowerFilter = filter.toLowerCase();
+	// Resetear paginación al filtrar o cambiar ordenamiento
+	useEffect(() => {
+		setCurrentPage(1)
+	}, [filter, sort])
 
-    // Algoritmo ineficiente de filtrado
-    let result = data.filter((item) => {
-      return item.name.toLowerCase().includes(lowerFilter) ||
-        item.description.toLowerCase().includes(lowerFilter) ||
-        item.category.toLowerCase().includes(lowerFilter);
-    });
+  const result = useMemo(() => useFilter(data, sort, filter.toLowerCase()), [filter, sort, data])
+	// const result =useMemo(() => useFilter(data, sort, filter.toLowerCase()), [filter, sort, data])
 
-    if (sort === 'asc') {
-      result = result.sort((a, b) => a.price - b.price);
-    } else {
-      result = result.sort((a, b) => b.price - a.price);
-    }
+	const processed = useMemo(() => expensiveCalculation(result), [result])
 
-    const processed = expensiveCalculation(result);
+  const totalItems = result.length
+  const totalValue = useMemo(() => processed.reduce((acc, curr) => acc + curr.price, 0), [processed])
 
-    setFilteredData(processed);
+	const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setFilter(e.target.value)
+	}
 
-    const totalValue = result.reduce((acc, curr) => acc + curr.price, 0);
-    setStats({ totalItems: result.length, totalValue });
+	const handleLoadMore = () => {
+		setCurrentPage((prev) => prev + 1)
+	}
 
-  }, [filter, sort, data]);
+	const totalPages = Math.ceil(totalItems / itemsPerPage)
+	const hasMore = currentPage < totalPages
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter(e.target.value);
-  };
+	// Renderiza el loading mientras carga
+	if (loading) return <Loading />
 
-  // Renderiza el loading mientras carga
-  if (loading) return <Loading />
+	return (
+		<div className='min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6'>
+			<div className='max-w-7xl mx-auto'>
+				<div className='bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-2xl p-8'>
+					<Header />
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm rounded-xl shadow-2xl p-8">
-          
-          <Header />
-          
-          <Filter filter={filter} handleFilterChange={handleFilterChange} sort={sort} setSort={setSort} />
+					<Filter
+						filter={filter}
+						handleFilterChange={handleFilterChange}
+						sort={sort}
+						setSort={setSort}
+					/>
 
-          <Stats totalItems={stats.totalItems} totalValue={stats.totalValue} />
+					<Stats
+						totalItems={totalItems}
+						totalValue={totalValue}
+					/>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-            <FilteredData filteredData={filteredData} />
-                      
-          </div>
-          
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default LegacyDashboard;
+				<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+					<FilteredData 
+						filteredData={processed} 
+						currentPage={currentPage}
+						itemsPerPage={itemsPerPage}
+						onLoadMore={handleLoadMore}
+						hasMore={hasMore}
+					/>
+				</div>
+				</div>
+			</div>
+		</div>
+	)
+}
+export default LegacyDashboard

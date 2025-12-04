@@ -1,21 +1,29 @@
 // Generador de datos para no depender de backend real
 import { ProductItem } from '@/types';
+
 export function generateMockData(count: number) {
   const categories = ['Electronics', 'Clothing', 'Home', 'Toys', 'Books'];
-  const data:ProductItem [] = [];
+  const data: ProductItem[] = [];
   
   for (let i = 0; i < count; i++) {
-    data.push({
+    const ramdon = Math.random().toString(36).substring(7);
+    const item: ProductItem = {
       id: `prod_${i}`,
-      name: `Producto ${i} - ${Math.random().toString(36).substring(7)}`,
+      name: `Producto ${i} - ${ramdon}`,
       description: `Esta es una descripción larga para el producto número ${i} que ocupa espacio en memoria y ayuda a testear el filtro de texto.`,
       price: Math.floor(Math.random() * 1000) + 10,
       category: categories[Math.floor(Math.random() * categories.length)],
       stock: Math.floor(Math.random() * 100),
       createdAt: new Date().toISOString(),
-    });
+      searchText: `producto ${i} - ${ramdon} esta es una descripción larga para el producto número ${i} que ocupa espacio en memoria y ayuda a testear el filtro de texto`.toLowerCase()
+    };  
+    data.push( item );
   }
+
+
   return data;
 };
 
-export const initialData = generateMockData(5000);
+export function getInitialData (count =1000) {
+  return generateMockData(count);
+} 

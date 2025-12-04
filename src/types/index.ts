@@ -72,10 +72,15 @@ export interface ProductItem {
   price: number
   category: string
   stock: number
-  createdAt: string
+	createdAt: string
+	searchText: string
 }
 
-// Props del componente FilteredData
+// Props del componente FilteredData (paginado)
 export interface FilteredDataProps {
   filteredData: ProductItem[]
+  currentPage: number
+  itemsPerPage: number
+  onLoadMore: () => void
+  hasMore: boolean
 }
