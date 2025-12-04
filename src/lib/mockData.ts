@@ -1,7 +1,8 @@
 // Generador de datos para no depender de backend real
-export function generateMockData (count: number) {
+import { ProductItem } from '@/types';
+export function generateMockData(count: number) {
   const categories = ['Electronics', 'Clothing', 'Home', 'Toys', 'Books'];
-  const data = [];
+  const data:ProductItem [] = [];
   
   for (let i = 0; i < count; i++) {
     data.push({

@@ -11,8 +11,9 @@ import { Header } from '@/components/Header';
 import { Filter } from '@/components/Filter';
 import { Stats } from '@/components/Stats';
 import { FilteredData } from '@/components/FilteredData';
+import { , ProductItem, StatsProps, FilterProps } from '@/types';
 
-const expensiveCalculation = (data: any[]) => {
+const expensiveCalculation = (data: ProductItem[]) => {
   console.log("Calculando estadísticas pesadas...");
   let sum = 0;
   for (let i = 0; i < data.length; i++) {
@@ -24,12 +25,12 @@ const expensiveCalculation = (data: any[]) => {
 };
 
 const LegacyDashboard = () => {
-  const [data, setData] = useState<any[]>([]);
-  const [filteredData, setFilteredData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("");
-  const [sort, setSort] = useState("asc");
-  const [stats, setStats] = useState<any>({});
+  const [data, setData] = useState<ProductItem[]>([]);
+  const [filteredData, setFilteredData] = useState<ProductItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [filter, setFilter] = useState<string>("");
+  const [sort, setSort] = useState<string>("asc");
+  const [stats, setStats] = useState<StatsProps>({totalItems: 0, totalValue: 0});
 
   // Fetching de datos simulado
   useEffect(() => {
@@ -42,7 +43,7 @@ const LegacyDashboard = () => {
     const lowerFilter = filter.toLowerCase();
 
     // Algoritmo ineficiente de filtrado
-    let result = data.filter((item: any) => {
+    let result = data.filter((item) => {
       return item.name.toLowerCase().includes(lowerFilter) ||
         item.description.toLowerCase().includes(lowerFilter) ||
         item.category.toLowerCase().includes(lowerFilter);
@@ -63,7 +64,7 @@ const LegacyDashboard = () => {
 
   }, [filter, sort, data]);
 
-  const handleFilterChange = (e: any) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilter(e.target.value);
   };
 
